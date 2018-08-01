@@ -32,6 +32,33 @@
         </li>
         <li class="breadcrumb-item active">Tables</li>
       </ol>
+
+      <form id="dateSelect" method="post" target="_BLANK" action="/api.php">
+
+<input type="hidden" name="action" value="insert">
+        Amount
+        <input type="decimal" name="amount">
+        date
+        <input type="date" name="date">
+        tag
+        <select id="tag" name="tag" style="height: 30px;width: 250px;">
+            <option value="-1">Select a Tag...</option>
+            <?php
+              foreach (getTags() as $tag) {
+                 echo "<option value=\"".$tag["id"]."\">".$tag["name"]."</option>\n";
+              }
+            ?>
+        </select>
+
+        description
+        <input type="description" name="description">
+
+
+
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+
+
       <!-- Example DataTables Card-->
       <div class="card mb-3">
         <div class="card-header">
