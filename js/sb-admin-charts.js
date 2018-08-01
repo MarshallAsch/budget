@@ -21,24 +21,7 @@ var myLineChart = new Chart(ctx, {
       pointHitRadius: 20,
       pointBorderWidth: 2,
       data: [10000, 30162, 26263, 18394, 18287, 28682, 31274, 33259, 25849, 24159, 32651, 31984, 38451],
-    }
-  ,
-  {
-        label: "S2",
-        lineTension: 0.3,
-        backgroundColor: "rgba(5,100,255,0.2)",
-        borderColor: "rgba(5,100,255,1)",
-        pointRadius: 5,
-        pointBackgroundColor: "rgba(5,100,255,1)",
-        pointBorderColor: "rgba(255,255,255,0.8)",
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: "rgba(5,100,255,1)",
-        pointHitRadius: 20,
-        pointBorderWidth: 2,
-        data: [30162, 26263, 18394, 18287, 18287, 10682, 61274, 30259, 41849, 40159, 20651, 20984, 30451],
-      }
-    ],
-  },
+    },
   options: {
     scales: {
       xAxes: [{

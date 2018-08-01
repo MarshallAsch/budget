@@ -127,10 +127,130 @@
     <!-- Custom scripts for this page-->
    <!-- <script src="js/sb-admin-charts.min.js"></script> -->
 
+
+<?php
+
+
+function getLables()
+{
+  $labels = "";
+
+    foreach (getAllDates() as $date) {
+      $labels = $labels. '"'. $date["date"].'", ';
+    }
+
+    return $labels;
+}
+
+
+function getDataSet($tag)
+{
+
+    $colors = ['#007bff', '#dc3545', '#ffc107', '#00ffaa', '#aabbcc', '#0a0a0a', '#f7f7f7', '#ff0000', '#0000ff', '#28a745', '#aaaaaa', '#020202', '#202020'];
+
+  if ($tag == -1){
+    $title = "Total";
+    $res = getTotalSpent();
+    $color = '#007bff';
+
+  } else {
+    $title = getTagTitle($tag);
+    $res = getTotoalTag($tag);
+    $color = $colors[$tag];
+  }
+
+
+
+
+  $data = "";
+  foreach ($res as $row) :
+        $data = $data."'".$row["spent"]."', ";
+   endforeach;
+
+
+   $dataset = "
+            {
+                label: \"{$title}\",
+                lineTension: 0.3,
+                backgroundColor: \"{$color}30\",
+                borderColor: \"{$color}ff\",
+                pointRadius: 5,
+                pointBackgroundColor: \"{$color}ff\",
+                pointBorderColor: \"rgba(255,255,255,0.8)\",
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: \"{$color}ff\",
+                pointHitRadius: 20,
+                pointBorderWidth: 2,
+                data: [{$data}],
+            }";
+
+  return $dataset;
+}
+
+
+
+
+?>
+
+<!-- For the line chart-->
+<script type="text/javascript">
+  var ctx = document.getElementById("myAreaChart");
+var myLineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [ <?php echo getLables(); ?>],
+            datasets: [
+
+            <?php
+
+            for ($i=1; $i < 13; $i++) {
+              if ($i == 9 || $i == 10 || $i == 7) {
+                continue;
+              }
+                echo getDataSet($i).',';
+
+              }
+              echo getDataSet(-1).',';
+
+            ?>
+
+            ],
+            options: {
+                scales: {
+                    xAxes: [{
+                        time: {
+                            unit: 'date'
+                        },
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 7
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            min: 0,
+                            max: 40000,
+                            maxTicksLimit: 5
+                        },
+                        gridLines: {
+                            color: "rgba(0, 0, 0, .125)",
+                        }
+                    }],
+                },
+                legend: {
+                    display: true
+                }
+            },
+        },
+    }
+);
+
+</script>
+
+<!-- This is for the one month pi chart-->
    <script type="text/javascript">
-
-
-
 <?php
 
 $year = date("Y");
@@ -140,9 +260,11 @@ if (isset($_GET["year"]) && $_GET["year"] > 1960 && $_GET["year"] < 2100) {
   $year = $_GET["year"];
 }
 
+
 if (isset($_GET["month"]) && $_GET["month"] > 0 && $_GET["month"] < 32) {
   $month = $_GET["month"];
 }
+
 
 
 $res = getTotalsForMonth($year, $month);

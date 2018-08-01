@@ -6,7 +6,7 @@
 
 
 -- money spent each month
-select CONCAT(CAST(YEAR(date) AS CHAR(4)), '-', CAST(MONTH(date) AS CHAR(4))) as date, sum(amount) as spent from budget where tag != 7 AND tag != 13 group by CONCAT(CAST(YEAR(date) AS CHAR(4)), '-', CAST(MONTH(date) AS CHAR(4)));
+select CONCAT(CAST(YEAR(date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0')) as date, coalesce(sum(amount), 0) as spent from budget where tag != 7 AND tag != 13 group by CONCAT(CAST(YEAR(date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0'));
 
 
 
@@ -35,12 +35,21 @@ select AVG(spent) from (select CONCAT(CAST(YEAR(date) AS CHAR(4)), '-', CAST(MON
 
 
 -- total by category
-select coalesce(total, 0) as total, name  from (select sum(amount) as total, tag from budget where date > CONCAT(@YEAR, '-', @MONTH,'-01') AND date <= CONCAT(@YEAR, '-', @MONTH,'-31') group by tag) as a  right join tags on a.tag = tags.idtags;
+select b.date, coalesce(spent, 0) as spent  from (select CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0')) as date, sum(budget.amount) as spent from budget where tag = 8 group by CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0'))) as a right join (select CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0')) as date from budget group by CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0'))) as b on a.date = b.date order by b.date asc;
+
+
+-- get all the months
+select CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0')) as date from budget group by CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0'));
 
 
 
 
 
+select CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0')) as date, sum(budget.amount) as spent from budget where tag = 3 group by CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0'));
 
-select coalesce(total, 0) as total, name  from (select sum(amount) as total, tag from budget where date >= "2018-05-01" AND date <= "2018-05-31" AND tag != 7 group by tag) as a  right join (select * from tags where idtags != 7) as b ON a.tag = b.idtags;
+
+
+
+-- get total spent for each month
+select coalesce(spent, 0) as spent, b.date from (select CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0')) as date, sum(budget.amount) as spent from budget where tag = 3 group by CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0'))) as a right join (select CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0')) as date from budget group by CONCAT(CAST(YEAR(budget.date) AS CHAR(4)), '-', LPAD(CAST(MONTH(budget.date) AS CHAR(4)), 2, '0'))) as b on a.date = b.date;
 
