@@ -61,6 +61,16 @@
 
 	function getTotalsForMonth($year, $month)
     {
+
+		if (!isset($year) || $year < 1960 || $year > 2100) {
+		 	$year = date("Y");
+		}
+
+		if (!isset($month) || $month <= 0 || $month > 31) {
+		 	$month = date("m");
+		}
+
+
         $connection = initiateConnection();
 
         //conection failed to establish
@@ -73,7 +83,7 @@
         $month = mysqli_real_escape_string($connection, trim($month));
 
 
-        $instruct = 'SELECT COALESCE(total, 0) AS total, name  as name FROM (SELECT SUM(amount) AS total, tag FROM budget WHERE date > "'.$year.'-'.$month.'-01" AND date <= "'.$year.'-'.$month.'-31" AND tag != 7 group by tag) AS a  RIGHT JOIN (select * from tags where idtags != 7 AND idtags != 13 AND idtags != 10 AND idtags != 9) as b ON a.tag = b.idtags';
+        $instruct = 'SELECT COALESCE(total, 0) AS total, name  as name FROM (SELECT SUM(amount) AS total, tag FROM budget WHERE date >= "'.$year.'-'.$month.'-01" AND date <= "'.$year.'-'.$month.'-31" AND tag != 7 group by tag) AS a  RIGHT JOIN (select * from tags where idtags != 7 AND idtags != 13 AND idtags != 10 AND idtags != 9) as b ON a.tag = b.idtags';
         $result =  mysqli_query($connection, $instruct);
 
         if ($result->num_rows == 0)
@@ -238,3 +248,90 @@
 
         return $results;
     }
+
+    function getTags()
+    {
+        $connection = initiateConnection();
+
+        //conection failed to establish
+        if (!$connection)
+        {
+            return false;
+        }
+
+        $instruct = 'SELECT idtags as id, name FROM tags order by idtags asc';
+        $result =  mysqli_query($connection, $instruct);
+
+        if ($result->num_rows == 0)
+        {
+            return false;
+        }
+        $results = array();
+
+        while($array = mysqli_fetch_assoc($result)) {
+            array_push($results, $array);
+        }
+
+        // Free result set
+        mysqli_free_result($result);
+
+        //close connection
+        mysqli_close($connection);
+
+        return $results;
+    }
+
+
+    function insertTransaction($date, $amount, $tag, $description)
+   	{
+   		$connection = initiateConnection();
+
+        //conection failed to establish
+        if (!$connection)
+        {
+            return false;
+        }
+
+   		$date = mysqli_real_escape_string($connection, trim($date));
+   		$amount = mysqli_real_escape_string($connection, trim($amount));
+   		$tag = mysqli_real_escape_string($connection, trim($tag));
+   		$description = mysqli_real_escape_string($connection, trim($description));
+
+
+   		$instruct = "INSERT into budget (date, amount, name, tag) VALUES (\"$date\", $amount, '$description', $tag)";
+
+        $result =  mysqli_query($connection, $instruct);
+
+
+        mysqli_close($connection);
+
+        return $result;
+   	}
+
+
+	function editTransaction($id, $date, $amount, $tag, $description)
+   	{
+   		$connection = initiateConnection();
+
+        //conection failed to establish
+        if (!$connection)
+        {
+            return false;
+        }
+
+   		$id = mysqli_real_escape_string($connection, trim($id));
+   		$date = mysqli_real_escape_string($connection, trim($date));
+   		$amount = mysqli_real_escape_string($connection, trim($amount));
+   		$tag = mysqli_real_escape_string($connection, trim($tag));
+   		$description = mysqli_real_escape_string($connection, trim($description));
+
+
+   		$instruct = "UPDATE budget set date = \"$date\", amount = $amount, name = '$description', tag = $tag where id = $id";
+
+        $result =  mysqli_query($connection, $instruct);
+
+        mysqli_close($connection);
+
+        return $result;
+   	}
+

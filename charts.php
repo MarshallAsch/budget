@@ -253,21 +253,8 @@ var myLineChart = new Chart(ctx, {
    <script type="text/javascript">
 <?php
 
-$year = date("Y");
-$month = date("m");
 
-if (isset($_GET["year"]) && $_GET["year"] > 1960 && $_GET["year"] < 2100) {
-  $year = $_GET["year"];
-}
-
-
-if (isset($_GET["month"]) && $_GET["month"] > 0 && $_GET["month"] < 32) {
-  $month = $_GET["month"];
-}
-
-
-
-$res = getTotalsForMonth($year, $month);
+$res = getTotalsForMonth($_GET["year"], $_GET["month"]);
 
 $labelList = "";
 $valueList = "";
